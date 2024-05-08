@@ -8,6 +8,9 @@ import (
 	"path/filepath"
 )
 
+const RED = "\033[31m"
+const RESET = "\033[0m"
+
 func searchCommand(cmd *flag.FlagSet, searchFileName *string) {
 
 	cmd.Parse(os.Args[2:])
@@ -40,7 +43,8 @@ func searchFile(name string) (string, error) {
 
 	err := filepath.Walk(root, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
-			fmt.Printf("Error accessing %s: %v\n", path, err)
+			fmt.Printf(RED + "Error accessing\t" + RESET)
+			fmt.Printf("%s: %v\n", path, err)
 			return nil
 		}
 
