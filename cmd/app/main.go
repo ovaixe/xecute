@@ -30,6 +30,7 @@ func main() {
 		flag.Usage()
 		fmt.Println("Usage: xecute <subcommand> [options]")
 		fmt.Println("Available subcommands:")
+		fmt.Println(CMDS)
 		searchCmd.Usage()
 		os.Exit(0)
 	}
