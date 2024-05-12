@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io/fs"
@@ -8,8 +9,7 @@ import (
 	"path/filepath"
 )
 
-const RED = "\033[31m"
-const RESET = "\033[0m"
+var ErrFileNotFound = errors.New("FILE NOT FOUND")
 
 func searchCommand(cmd *flag.FlagSet, searchFileName *string) {
 
@@ -24,12 +24,7 @@ func searchCommand(cmd *flag.FlagSet, searchFileName *string) {
 
 	filePath, err := searchFile(*searchFileName)
 	if err != nil {
-		fmt.Println("Error: ", err)
-		os.Exit(1)
-	}
-
-	if filePath == "" {
-		fmt.Println("File not found")
+		writeError("ERROR", "", err)
 		os.Exit(1)
 	}
 
@@ -43,8 +38,7 @@ func searchFile(name string) (string, error) {
 
 	err := filepath.Walk(root, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
-			fmt.Printf(RED + "Error accessing\t" + RESET)
-			fmt.Printf("%s: %v\n", path, err)
+			writeError("Error accessing", path, err)
 			return nil
 		}
 
@@ -56,7 +50,11 @@ func searchFile(name string) (string, error) {
 	})
 
 	if err != nil {
-		return filePath, err
+		return "", err
+	}
+
+	if filePath == "" {
+		return "", ErrFileNotFound
 	}
 
 	return filePath, nil
