@@ -18,7 +18,7 @@ confirm:
 
 ## run/app: run the 'cmd/app' application
 run/app:
-	go run ./cmd/app
+	go run ./cmd/app $(filter-out $@,$(MAKECMDGOALS))
 
 # ================================================================= #
 # QUALITY CONTROL
