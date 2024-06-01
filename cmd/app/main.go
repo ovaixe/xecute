@@ -10,11 +10,14 @@ var version = "1.0.0"
 
 var buildTime string
 
-var CMDS = []string{"search"}
+var CMDS = []string{"search", "clipboard"}
 
 func main() {
 	searchCmd := flag.NewFlagSet("search", flag.ExitOnError)
 	searchFileName := searchCmd.String("filename", "", "Search file name")
+
+	clipboardCmd := flag.NewFlagSet("clipboard", flag.ExitOnError)
+	clipboardFilePath := clipboardCmd.String("filename", "", "Text file name")
 
 	displayVersion := flag.Bool("version", false, "Display version and Build time")
 
@@ -38,6 +41,8 @@ func main() {
 	switch os.Args[1] {
 	case "search":
 		searchCommand(searchCmd, searchFileName)
+	case "clipboard":
+		copyCammand(clipboardCmd, clipboardFilePath)
 	default:
 		fmt.Println("expected subcommand")
 		fmt.Println("Available commands:")
