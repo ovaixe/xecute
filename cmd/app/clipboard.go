@@ -6,7 +6,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 )
@@ -28,16 +27,14 @@ func copyCammand(cmd *flag.FlagSet, filepath *string) {
 func writeAll(filepath string) error {
 	data, err := os.ReadFile(filepath)
 	if err != nil {
-		log.Fatalf("Failed to read file: %v", err)
-		return errors.New("Failed to read file")
+		return errors.New("FAILED TO READ FILE")
 	}
 
 	copyCmd := exec.Command("xclip", "-selection", "clipboard")
 	copyCmd.Stdin = io.NopCloser(bytes.NewReader(data))
 	err = copyCmd.Run()
 	if err != nil {
-		log.Fatalf("Failed to copy to clipboard: %v", err)
-		return errors.New("Failed to copy to clipboard")
+		return errors.New("FAILED TO COPY TO CLIPBOARD: ")
 	}
 
 	fmt.Println("Text copied to clipboard successfully!")

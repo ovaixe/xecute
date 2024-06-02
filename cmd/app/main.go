@@ -17,7 +17,7 @@ func main() {
 	searchFileName := searchCmd.String("filename", "", "Search file name")
 
 	clipboardCmd := flag.NewFlagSet("clipboard", flag.ExitOnError)
-	clipboardFilePath := clipboardCmd.String("filename", "", "Text file name")
+	clipboardFilePath := clipboardCmd.String("filepath", "", "Text file path")
 
 	displayVersion := flag.Bool("version", false, "Display version and Build time")
 
