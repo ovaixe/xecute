@@ -11,18 +11,33 @@ import (
 
 var ErrFileNotFound = errors.New("FILE NOT FOUND")
 
-func searchCommand(cmd *flag.FlagSet, searchFileName *string) {
+type SearchCommand struct {
+	cmd      *flag.FlagSet
+	fileName *string
+}
 
-	cmd.Parse(os.Args[2:])
-	if *searchFileName == "" {
-		cmd.Usage()
+func NewSearchCommand() SearchCommand {
+	searchCmd := flag.NewFlagSet("search", flag.ExitOnError)
+	searchFileName := searchCmd.String("filename", "", "Search file name")
+
+	return SearchCommand{
+		cmd:      searchCmd,
+		fileName: searchFileName,
+	}
+}
+
+func (command SearchCommand) execute() {
+
+	command.cmd.Parse(os.Args[2:])
+	if *command.fileName == "" {
+		command.cmd.Usage()
 		os.Exit(1)
 	}
 
 	fmt.Println("subcommand 'search'")
-	fmt.Println("filename: ", *searchFileName)
+	fmt.Println("filename: ", *command.fileName)
 
-	filePath, err := searchFile(*searchFileName)
+	filePath, err := command.searchFile()
 	if err != nil {
 		writeError("ERROR", "", err)
 		os.Exit(1)
@@ -31,7 +46,7 @@ func searchCommand(cmd *flag.FlagSet, searchFileName *string) {
 	fmt.Println("File Path: ", filePath)
 }
 
-func searchFile(name string) (string, error) {
+func (command SearchCommand) searchFile() (string, error) {
 	root := "/"
 
 	var filePath string
@@ -42,7 +57,7 @@ func searchFile(name string) (string, error) {
 			return nil
 		}
 
-		if !info.IsDir() && info.Name() == name {
+		if !info.IsDir() && info.Name() == *command.fileName {
 			filePath = path
 		}
 

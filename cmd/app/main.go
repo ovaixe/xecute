@@ -13,12 +13,6 @@ var buildTime string
 var CMDS = []string{"search", "clipboard"}
 
 func main() {
-	searchCmd := flag.NewFlagSet("search", flag.ExitOnError)
-	searchFileName := searchCmd.String("filename", "", "Search file name")
-
-	clipboardCmd := flag.NewFlagSet("clipboard", flag.ExitOnError)
-	clipboardFilePath := clipboardCmd.String("filepath", "", "Text file path")
-
 	displayVersion := flag.Bool("version", false, "Display version and Build time")
 
 	flag.Parse()
@@ -29,20 +23,25 @@ func main() {
 		os.Exit(0)
 	}
 
+	searchCmd := NewSearchCommand()
+
+	clipboardCmd := NewClipboardCommand()
+
 	if len(os.Args) < 2 {
 		flag.Usage()
 		fmt.Println("Usage: xecute <subcommand> [options]")
 		fmt.Println("Available subcommands:")
 		fmt.Println(CMDS)
-		searchCmd.Usage()
+		searchCmd.cmd.Usage()
+		clipboardCmd.cmd.Usage()
 		os.Exit(0)
 	}
 
 	switch os.Args[1] {
 	case "search":
-		searchCommand(searchCmd, searchFileName)
+		searchCmd.execute()
 	case "clipboard":
-		copyCammand(clipboardCmd, clipboardFilePath)
+		clipboardCmd.execute()
 	default:
 		fmt.Println("expected subcommand")
 		fmt.Println("Available commands:")
