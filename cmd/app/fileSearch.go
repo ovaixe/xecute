@@ -13,32 +13,40 @@ var ErrFileNotFound = errors.New("FILE NOT FOUND")
 
 type SearchCommand struct {
 	cmd      *flag.FlagSet
-	fileName *string
 	root     *string
+	fileName string
 }
 
 func NewSearchCommand() SearchCommand {
 	searchCmd := flag.NewFlagSet("search", flag.ExitOnError)
-	searchFileName := searchCmd.String("filename", "", "Search file name")
 	rootDir := searchCmd.String("root", "/", "Root directory")
 
+	searchCmd.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage of %s:\n", searchCmd.Name())
+		fmt.Fprintf(os.Stderr, "  %s [options] <filename>\n", searchCmd.Name())
+		fmt.Fprintf(os.Stderr, "Options:\n")
+		searchCmd.PrintDefaults()
+	}
+
 	return SearchCommand{
-		cmd:      searchCmd,
-		fileName: searchFileName,
-		root:     rootDir,
+		cmd:  searchCmd,
+		root: rootDir,
 	}
 }
 
 func (command SearchCommand) execute() {
 
 	command.cmd.Parse(os.Args[2:])
-	if *command.fileName == "" {
+	if command.cmd.NArg() < 1 {
+		fmt.Println("expected filename")
 		command.cmd.Usage()
 		os.Exit(1)
 	}
 
+	command.fileName = command.cmd.Arg(0)
+
 	fmt.Println("subcommand 'search'")
-	fmt.Println("filename: ", *command.fileName)
+	fmt.Println("filename: ", command.fileName)
 
 	filePath, err := command.searchFile()
 	if err != nil {
@@ -58,7 +66,7 @@ func (command SearchCommand) searchFile() (string, error) {
 			return nil
 		}
 
-		if !info.IsDir() && info.Name() == *command.fileName {
+		if !info.IsDir() && info.Name() == command.fileName {
 			filePath = path
 		}
 
