@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	// "strings"
 )
 
 var (
@@ -17,31 +18,37 @@ var (
 
 type ClipboardCommand struct {
 	cmd      *flag.FlagSet
-	filePath *string
 	dir      *string
-	fileName *string
+	fileName string
 }
 
 func NewClipboardCommand() ClipboardCommand {
-	clipboardCmd := flag.NewFlagSet("clipboard", flag.ExitOnError)
-	clipboardFilePath := clipboardCmd.String("filepath", "", "Text file path")
-	clipboardDir := clipboardCmd.String("dir", "./", "Directory")
-	clipboardFileName := clipboardCmd.String("filename", "", "Text file name")
+	clipboardCmd := flag.NewFlagSet("xclip", flag.ExitOnError)
+	clipboardDir := clipboardCmd.String("dir", ".", "Directory")
+
+	clipboardCmd.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage of %s:\n", clipboardCmd.Name())
+		fmt.Fprintf(os.Stderr, "  %s [options] <filename>\n", clipboardCmd.Name())
+		fmt.Fprintf(os.Stderr, "Options:\n")
+		clipboardCmd.PrintDefaults()
+	}
 
 	return ClipboardCommand{
-		cmd:      clipboardCmd,
-		filePath: clipboardFilePath,
-		dir:      clipboardDir,
-		fileName: clipboardFileName,
+		cmd: clipboardCmd,
+		dir: clipboardDir,
 	}
 }
 
 func (command ClipboardCommand) execute() {
 	command.cmd.Parse(os.Args[2:])
-	if *command.filePath == "" && *command.fileName == "" {
+
+	if command.cmd.NArg() < 1 {
+		fmt.Println("expected filename")
 		command.cmd.Usage()
-		os.Exit(1)
+		os.Exit(0)
 	}
+
+	command.fileName = command.cmd.Arg(0)
 
 	err := command.writeAll()
 	if err != nil {
@@ -51,13 +58,7 @@ func (command ClipboardCommand) execute() {
 }
 
 func (command ClipboardCommand) writeAll() error {
-	var file string
-
-	if *command.filePath != "" {
-		file = *command.filePath
-	} else {
-		file = *command.dir + "/" + *command.fileName
-	}
+	file := *command.dir + "/" + command.fileName
 
 	data, err := os.ReadFile(file)
 	if err != nil {

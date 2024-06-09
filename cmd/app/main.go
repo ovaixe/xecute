@@ -10,7 +10,7 @@ var version = "1.0.0"
 
 var buildTime string
 
-var CMDS = []string{"search", "clipboard"}
+var CMDS = []string{"search", "xclip"}
 
 func main() {
 	displayVersion := flag.Bool("version", false, "Display version and Build time")
@@ -40,7 +40,7 @@ func main() {
 	switch os.Args[1] {
 	case "search":
 		searchCmd.execute()
-	case "clipboard":
+	case "xclip":
 		clipboardCmd.execute()
 	default:
 		fmt.Println("expected subcommand")
