@@ -32,7 +32,7 @@ func NewClipboardCommand() ClipboardCommand {
 	}
 }
 
-func (command ClipboardCommand) execute() {
+func (command *ClipboardCommand) execute() {
 	command.cmd.Parse(os.Args[2:])
 
 	if command.cmd.NArg() < 1 {
@@ -50,7 +50,7 @@ func (command ClipboardCommand) execute() {
 	}
 }
 
-func (command ClipboardCommand) writeAll() error {
+func (command *ClipboardCommand) writeAll() error {
 	file := *command.dir + "/" + command.fileName
 
 	data, err := os.ReadFile(file)
@@ -60,8 +60,8 @@ func (command ClipboardCommand) writeAll() error {
 
 	copyCmd := exec.Command("xclip", "-selection", "clipboard")
 	copyCmd.Stdin = io.NopCloser(bytes.NewReader(data))
-	err = copyCmd.Run()
-	if err != nil {
+
+	if err := copyCmd.Run(); err != nil {
 		return err
 	}
 
