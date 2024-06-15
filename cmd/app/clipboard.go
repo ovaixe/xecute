@@ -2,18 +2,11 @@ package main
 
 import (
 	"bytes"
-	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
-	// "strings"
-)
-
-var (
-	ErrFileRead      = errors.New("FAILED TO READ FILE")
-	ErrClipboardCopy = errors.New("FAILED TO COPY TO CLIPBOARD")
 )
 
 type ClipboardCommand struct {
