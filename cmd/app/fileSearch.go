@@ -1,16 +1,13 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
-	"io/fs"
 	"os"
-	"path/filepath"
-	"strings"
+
+  "github.com/ovaixe/xecute/internals/search"
 )
 
-var ErrFileNotFound = errors.New("FILE NOT FOUND")
 
 type SearchCommand struct {
 	cmd         *flag.FlagSet
@@ -49,47 +46,14 @@ func (command *SearchCommand) execute() {
 
 	command.fileName = command.cmd.Arg(0)
 
-	err := command.walkFiles()
+	filePaths, err := search.SearchFile(*command.root, command.fileName, *command.insensitive) 
 	if err != nil {
 		writeError("ERROR", "", err)
 		os.Exit(1)
 	}
 
+  command.result = filePaths
 	command.printResults()
-}
-
-func (command *SearchCommand) walkFiles() error {
-	var filePaths []string
-
-	err := filepath.Walk(*command.root, func(path string, info fs.FileInfo, err error) error {
-		if err != nil {
-			return nil
-		}
-
-		switch {
-		case *command.insensitive:
-			if !info.IsDir() && strings.Contains(strings.ToLower(info.Name()), strings.ToLower(command.fileName)) {
-				filePaths = append(filePaths, path)
-			}
-		default:
-			if !info.IsDir() && info.Name() == command.fileName {
-				filePaths = append(filePaths, path)
-			}
-		}
-
-		return nil
-	})
-
-	if err != nil {
-		return err
-	}
-
-	if len(filePaths) == 0 {
-		return ErrFileNotFound
-	}
-
-	command.result = filePaths
-	return nil
 }
 
 func (command *SearchCommand) printResults() {

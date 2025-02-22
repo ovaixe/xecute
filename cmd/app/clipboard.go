@@ -1,12 +1,11 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
-	"io"
 	"os"
-	"os/exec"
+
+  "github.com/ovaixe/xecute/internals/clipboard"
 )
 
 type ClipboardCommand struct {
@@ -16,8 +15,8 @@ type ClipboardCommand struct {
 }
 
 func NewClipboardCommand() ClipboardCommand {
-	clipboardCmd := flag.NewFlagSet("xclip", flag.ExitOnError)
-	clipboardDir := clipboardCmd.String("dir", ".", "Directory")
+	clipboardCmd := flag.NewFlagSet("clip", flag.ExitOnError)
+	clipboardDir := clipboardCmd.String("dir", "./", "Directory")
 
 	clipboardCmd.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s:\n", clipboardCmd.Name())
@@ -42,29 +41,20 @@ func (command *ClipboardCommand) execute() {
 	}
 
 	command.fileName = command.cmd.Arg(0)
+  file := *command.dir + "/" + command.fileName
 
-	err := command.writeAll()
+  data, err := os.ReadFile(file)
 	if err != nil {
 		writeError("ERROR", "", err)
 		os.Exit(1)
 	}
+
+  err = clipboard.Write(data)
+  if err != nil {
+    writeError("ERROR", "", err)
+    os.Exit(1)
+  }
+
+  fmt.Println("Text copied to clipboard")
 }
 
-func (command *ClipboardCommand) writeAll() error {
-	file := *command.dir + "/" + command.fileName
-
-	data, err := os.ReadFile(file)
-	if err != nil {
-		return err
-	}
-
-	copyCmd := exec.Command("xclip", "-selection", "clipboard")
-	copyCmd.Stdin = io.NopCloser(bytes.NewReader(data))
-
-	if err := copyCmd.Run(); err != nil {
-		return err
-	}
-
-	fmt.Println("Text copied to clipboard successfully!")
-	return nil
-}
