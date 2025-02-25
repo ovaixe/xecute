@@ -58,4 +58,4 @@ linker_flags = '-s -X main.buildTime=${current_time} -X main.version=${git_descr
 build/app:
 	@echo 'Building cmd/app...'
 	go build -ldflags=${linker_flags} -o=./bin/xecute ./cmd/app
-	GOOS=linux GOARCH=amd64 go build -ldflags=${linker_flags} -o=./bin/linux_amd64/xecute ./cmd/app
+	GOOS=linux GOARCH=amd64 go build -ldflags=${linker_flags} -o=./bin/xecute_linux_amd64 ./cmd/app
