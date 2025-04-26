@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/ovaixe/xecute/internals/commands"
 )
 
 var version = "dev"
@@ -23,24 +25,24 @@ func main() {
 		os.Exit(0)
 	}
 
-	searchCmd := NewSearchCommand()
-	clipboardCmd := NewClipboardCommand()
+	searchCmd := commands.NewSearchCommand()
+	clipboardCmd := commands.NewClipboardCommand()
 
 	if len(os.Args) < 2 {
 		flag.Usage()
 		fmt.Println("Usage: xecute <subcommand> [options]")
 		fmt.Println("Available subcommands:")
 		fmt.Println(CMDS)
-		searchCmd.cmd.Usage()
-		clipboardCmd.cmd.Usage()
+		searchCmd.CMD.Usage()
+		clipboardCmd.CMD.Usage()
 		os.Exit(0)
 	}
 
 	switch os.Args[1] {
 	case "s":
-		searchCmd.execute()
+		searchCmd.Execute()
 	case "c":
-		clipboardCmd.execute()
+		clipboardCmd.Execute()
 	default:
 		fmt.Println("expected subcommand")
 		fmt.Println("Available commands:")

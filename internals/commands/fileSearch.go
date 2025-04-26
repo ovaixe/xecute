@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"flag"
@@ -6,10 +6,11 @@ import (
 	"os"
 
 	"github.com/ovaixe/xecute/internals/search"
+	"github.com/ovaixe/xecute/internals/utils"
 )
 
 type SearchCommand struct {
-	cmd         *flag.FlagSet
+	CMD         *flag.FlagSet
 	root        *string
 	insensitive *bool
 	fileName    string
@@ -29,25 +30,25 @@ func NewSearchCommand() SearchCommand {
 	}
 
 	return SearchCommand{
-		cmd:         searchCmd,
+		CMD:         searchCmd,
 		root:        rootDir,
 		insensitive: insensitive,
 	}
 }
 
-func (command *SearchCommand) execute() {
-	command.cmd.Parse(os.Args[2:])
-	if command.cmd.NArg() < 1 {
+func (command *SearchCommand) Execute() {
+	command.CMD.Parse(os.Args[2:])
+	if command.CMD.NArg() < 1 {
 		fmt.Println("expected filename")
-		command.cmd.Usage()
+		command.CMD.Usage()
 		os.Exit(1)
 	}
 
-	command.fileName = command.cmd.Arg(0)
+	command.fileName = command.CMD.Arg(0)
 
 	filePaths, err := search.SearchFile(*command.root, command.fileName, *command.insensitive)
 	if err != nil {
-		writeError("ERROR", "", err)
+		utils.WriteError("ERROR", "", err)
 		os.Exit(1)
 	}
 

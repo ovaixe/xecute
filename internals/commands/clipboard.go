@@ -1,15 +1,17 @@
-package main
+package commands
 
 import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/ovaixe/xecute/internals/clipboard"
+	"github.com/ovaixe/xecute/internals/utils"
 )
 
 type ClipboardCommand struct {
-	cmd      *flag.FlagSet
+	CMD      *flag.FlagSet
 	dir      *string
 	fileName string
 }
@@ -26,32 +28,37 @@ func NewClipboardCommand() ClipboardCommand {
 	}
 
 	return ClipboardCommand{
-		cmd: clipboardCmd,
+		CMD: clipboardCmd,
 		dir: clipboardDir,
 	}
 }
 
-func (command *ClipboardCommand) execute() {
-	command.cmd.Parse(os.Args[2:])
+func (command *ClipboardCommand) Execute() {
+	command.CMD.Parse(os.Args[2:])
 
-	if command.cmd.NArg() < 1 {
+	if command.CMD.NArg() < 1 {
 		fmt.Println("expected filename")
-		command.cmd.Usage()
+		command.CMD.Usage()
 		os.Exit(0)
 	}
 
-	command.fileName = command.cmd.Arg(0)
-	file := *command.dir + "/" + command.fileName
+	command.fileName = command.CMD.Arg(0)
+	dir := *command.dir
+	if !strings.HasSuffix(dir, "/") {
+		dir += "/"
+	}
+
+	file := dir + command.fileName
 
 	data, err := os.ReadFile(file)
 	if err != nil {
-		writeError("ERROR", "", err)
+		utils.WriteError("ERROR", "", err)
 		os.Exit(1)
 	}
 
 	err = clipboard.Write(data)
 	if err != nil {
-		writeError("ERROR", "", err)
+		utils.WriteError("ERROR", "", err)
 		os.Exit(1)
 	}
 
