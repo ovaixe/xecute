@@ -11,7 +11,7 @@ A simple CLI tool for searching files and copying file to the clipboard.
 - For Wayland systems:
   - Requires `wl-clipboard`
 
-**Note:** Make sure the required clipboard utility is installed and available in you `PATH`
+**Note:** Make sure the required clipboard utility is installed and available in your `PATH`
 
 ## Usage
 
