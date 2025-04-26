@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-var version = "1.0.1"
+var version = "dev"
 
 var buildTime string
 

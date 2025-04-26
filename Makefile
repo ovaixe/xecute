@@ -50,7 +50,7 @@ vendor:
 # ================================================================= #
 
 current_time = $(shell date --iso-8601=seconds)
-git_description = $(shell git describe --always --dirty  --tags --long)
+git_description = $(shell git describe --always --tags)
 linker_flags = '-s -X main.buildTime=${current_time} -X main.version=${git_description}'
 
 ## build/app: build the 'cmd/app' application
@@ -59,3 +59,25 @@ build/app:
 	@echo 'Building cmd/app...'
 	go build -ldflags=${linker_flags} -o=./bin/xecute ./cmd/app
 	GOOS=linux GOARCH=amd64 go build -ldflags=${linker_flags} -o=./bin/xecute_linux_amd64 ./cmd/app
+
+# ================================================================= #
+# TAGGING & RELEASE
+# ================================================================= #
+
+# Tag name can be passed like: make tag version=v1.0.0
+version ?= $(shell git describe --tags --abbrev=0)
+
+## tag: create a git tag
+.PHONY: tag
+tag:
+	@if git rev-parse $(version) > /dev/null 2>&1; then \
+		echo "Tag $(version) already exists! Aborting." \
+		exit 1; \
+	fi
+	@git tag -a $(version) -m "Relase $(version)"
+	@git push origin $(version)
+
+## release: creates tag and builds 'cmd/app'
+.PHONY: release
+release: tag build/app
+

@@ -1,10 +1,10 @@
 package search
 
 import (
-  "errors"
-  "io/fs"
-  "path/filepath"
-  "strings"
+	"errors"
+	"io/fs"
+	"path/filepath"
+	"strings"
 )
 
 var ErrFileNotFound = errors.New("FILE NOT FOUND")
@@ -17,15 +17,25 @@ func SearchFile(dir, fileName string, insensitive bool) ([]string, error) {
 			return nil
 		}
 
+		if info.IsDir() {
+			return nil
+		}
+
+		match := false
+
 		switch {
 		case insensitive:
-			if !info.IsDir() && strings.Contains(strings.ToLower(info.Name()), strings.ToLower(fileName)) {
-				filePaths = append(filePaths, path)
-			}
+			match = strings.Contains(strings.ToLower(info.Name()), strings.ToLower(fileName))
 		default:
-			if !info.IsDir() && info.Name() == fileName {
-				filePaths = append(filePaths, path)
+			match = info.Name() == fileName
+		}
+
+		if match {
+			absPath, err := filepath.Abs(path)
+			if err != nil {
+				return err
 			}
+			filePaths = append(filePaths, absPath)
 		}
 
 		return nil
@@ -39,5 +49,5 @@ func SearchFile(dir, fileName string, insensitive bool) ([]string, error) {
 		return nil, ErrFileNotFound
 	}
 
-  return filePaths, nil
+	return filePaths, nil
 }
