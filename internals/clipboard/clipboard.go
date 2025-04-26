@@ -1,28 +1,51 @@
 package clipboard
 
 import (
-  "os/exec"
-  "io"
-  "bytes"
+	"errors"
+	"os/exec"
+
+	"github.com/ovaixe/xecute/internals/platform"
 )
 
 func Read() (string, error) {
-  cmd := exec.Command("xclip", "-selection", "clipboard", "-o")
-  out, err := cmd.Output()
-  if err != nil {
-    return "", err
-  }
+	cmd := exec.Command("xclip", "-selection", "clipboard", "-o")
+	out, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
 
-  return string(out), nil
+	return string(out), nil
 }
 
 func Write(data []byte) error {
-	cmd := exec.Command("xclip", "-selection", "clipboard")
-  cmd.Stdin = io.NopCloser(bytes.NewReader(data))
+	var cmd *exec.Cmd
 
-  if err := cmd.Run(); err != nil {
-    return err
-  }
+	// Check if WAYLAND_DISPLAY is set
+	if platform.IsWayland() {
+		cmd = exec.Command("wl-copy")
+	} else if platform.IsX11() {
+		cmd = exec.Command("xclip", "-selection", "clipboard")
+	} else {
+		return errors.New("no clipboard tool available: not running on wayland or X11")
+	}
 
-  return nil
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		return err
+	}
+
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+
+	_, err = stdin.Write(data)
+	if err != nil {
+		return err
+	}
+
+	if err := stdin.Close(); err != nil {
+		return err
+	}
+
+	return cmd.Wait()
 }
