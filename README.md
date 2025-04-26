@@ -16,10 +16,10 @@ A simple CLI tool for searching files and copying file to the clipboard.
 ## Usage
 
 Search for a file:
-`xecute s -r=/home filename`
+- `xecute s -r=/home filename`
 
 Copy file contents to clipboard
-`xecute c -d=/home filename`
+- `xecute c -d=/home filename`
 
 ### ✨ Bonus tip
 
