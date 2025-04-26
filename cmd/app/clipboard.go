@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-  "github.com/ovaixe/xecute/internals/clipboard"
+	"github.com/ovaixe/xecute/internals/clipboard"
 )
 
 type ClipboardCommand struct {
@@ -15,11 +15,11 @@ type ClipboardCommand struct {
 }
 
 func NewClipboardCommand() ClipboardCommand {
-	clipboardCmd := flag.NewFlagSet("clip", flag.ExitOnError)
-	clipboardDir := clipboardCmd.String("dir", "./", "Directory")
+	clipboardCmd := flag.NewFlagSet("c", flag.ExitOnError)
+	clipboardDir := clipboardCmd.String("d", "./", "Directory")
 
 	clipboardCmd.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage of %s:\n", clipboardCmd.Name())
+		fmt.Fprintf(os.Stderr, "Usage of %s: copies file content to clipboard\n", clipboardCmd.Name())
 		fmt.Fprintf(os.Stderr, "  %s [options] <filename>\n", clipboardCmd.Name())
 		fmt.Fprintf(os.Stderr, "Options:\n")
 		clipboardCmd.PrintDefaults()
@@ -41,20 +41,19 @@ func (command *ClipboardCommand) execute() {
 	}
 
 	command.fileName = command.cmd.Arg(0)
-  file := *command.dir + "/" + command.fileName
+	file := *command.dir + "/" + command.fileName
 
-  data, err := os.ReadFile(file)
+	data, err := os.ReadFile(file)
 	if err != nil {
 		writeError("ERROR", "", err)
 		os.Exit(1)
 	}
 
-  err = clipboard.Write(data)
-  if err != nil {
-    writeError("ERROR", "", err)
-    os.Exit(1)
-  }
+	err = clipboard.Write(data)
+	if err != nil {
+		writeError("ERROR", "", err)
+		os.Exit(1)
+	}
 
-  fmt.Println("Text copied to clipboard")
+	fmt.Println("Text copied to clipboard")
 }
-

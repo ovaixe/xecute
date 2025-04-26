@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"os"
 
-  "github.com/ovaixe/xecute/internals/search"
+	"github.com/ovaixe/xecute/internals/search"
 )
-
 
 type SearchCommand struct {
 	cmd         *flag.FlagSet
@@ -18,12 +17,12 @@ type SearchCommand struct {
 }
 
 func NewSearchCommand() SearchCommand {
-	searchCmd := flag.NewFlagSet("search", flag.ExitOnError)
-	rootDir := searchCmd.String("root", "/", "Root directory")
+	searchCmd := flag.NewFlagSet("s", flag.ExitOnError)
+	rootDir := searchCmd.String("r", "/", "Root directory")
 	insensitive := searchCmd.Bool("i", false, "Ignore case sensitive")
 
 	searchCmd.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage of %s:\n", searchCmd.Name())
+		fmt.Fprintf(os.Stderr, "Usage of %s: searches for filename\n", searchCmd.Name())
 		fmt.Fprintf(os.Stderr, "  %s [options] <filename>\n", searchCmd.Name())
 		fmt.Fprintf(os.Stderr, "Options:\n")
 		searchCmd.PrintDefaults()
@@ -46,13 +45,13 @@ func (command *SearchCommand) execute() {
 
 	command.fileName = command.cmd.Arg(0)
 
-	filePaths, err := search.SearchFile(*command.root, command.fileName, *command.insensitive) 
+	filePaths, err := search.SearchFile(*command.root, command.fileName, *command.insensitive)
 	if err != nil {
 		writeError("ERROR", "", err)
 		os.Exit(1)
 	}
 
-  command.result = filePaths
+	command.result = filePaths
 	command.printResults()
 }
 
