@@ -31,8 +31,7 @@ func main() {
 	if len(os.Args) < 2 {
 		flag.Usage()
 		fmt.Println("Usage: xecute <subcommand> [options]")
-		fmt.Println("Available subcommands:")
-		fmt.Println(CMDS)
+		fmt.Fprintln(os.Stdout, "Available subcommands: ", CMDS)
 		searchCmd.CMD.Usage()
 		clipboardCmd.CMD.Usage()
 		os.Exit(0)
